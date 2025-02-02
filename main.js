@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
   canvas.width = 800;
   canvas.height = 600;
 
-  // TrafficLight-Klasse mit realistischer Darstellung
   class TrafficLight {
     constructor(x, y, timer = 30) {
       this.x = x;
@@ -30,7 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     changeState() {
       this.state = this.state === 'rot' ? 'grün' : this.state === 'grün' ? 'gelb' : 'rot';
-      console.log(`Ampel wechselt zu: ${this.state}`);
     }
 
     updateTimer(newTimer) {
@@ -40,33 +38,52 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     draw(ctx) {
-      // Ampel-Gehäuse zeichnen
-      ctx.fillStyle = 'black';
-      ctx.fillRect(this.x - 15, this.y - 50, 30, 90);
+      // Ampelgehäuse
+      ctx.fillStyle = '#404040';
+      ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      ctx.shadowBlur = 5;
+      ctx.shadowOffsetY = 3;
+      
+      // Hauptkörper
+      ctx.fillRect(this.x - 25, this.y - 100, 50, 200);
+      
+      // Seitliche Verstrebungen
+      ctx.fillRect(this.x - 35, this.y - 90, 70, 20);
+      ctx.fillRect(this.x - 35, this.y + 70, 70, 20);
+      
+      // Lampen
+      const drawLight = (yOffset, activeColor, inactiveColor) => {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y + yOffset, 15, 0, Math.PI * 2);
+        ctx.fillStyle = this.state === activeColor ? activeColor : inactiveColor;
+        
+        if (this.state === activeColor) {
+          ctx.shadowColor = activeColor;
+          ctx.shadowBlur = 20;
+        }
+        
+        ctx.fill();
+        
+        // Reset shadow
+        ctx.shadowColor = 'rgba(0,0,0,0.5)';
+        ctx.shadowBlur = 5;
+      };
 
-      // Rot
-      ctx.beginPath();
-      ctx.arc(this.x, this.y - 30, 10, 0, Math.PI * 2);
-      ctx.fillStyle = this.state === 'rot' ? 'red' : 'darkred';
-      ctx.fill();
+      // Rote Lampe
+      drawLight(-60, 'rot', '#330000');
+      // Gelbe Lampe
+      drawLight(0, 'gelb', '#333300');
+      // Grüne Lampe
+      drawLight(60, 'grün', '#003300');
 
-      // Gelb
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, 10, 0, Math.PI * 2);
-      ctx.fillStyle = this.state === 'gelb' ? 'yellow' : 'darkgoldenrod';
-      ctx.fill();
-
-      // Grün
-      ctx.beginPath();
-      ctx.arc(this.x, this.y + 30, 10, 0, Math.PI * 2);
-      ctx.fillStyle = this.state === 'grün' ? 'green' : 'darkgreen';
-      ctx.fill();
+      // Gehäusedetails
+      ctx.strokeStyle = '#202020';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(this.x - 25, this.y - 100, 50, 200);
     }
   }
 
-  // Eine Ampel mittig auf dem Canvas platzieren
   const trafficLight = new TrafficLight(canvas.width / 2, canvas.height / 2, 5);
-
   let lastTime = performance.now();
 
   function gameLoop(time) {
@@ -76,7 +93,6 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     drawCityGrid();
-
     trafficLight.update(deltaTime);
     trafficLight.draw(ctx);
 
@@ -85,7 +101,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function drawCityGrid() {
     const gridSize = 50;
-    ctx.strokeStyle = '#ddd';
+    ctx.strokeStyle = '#eee';
+    ctx.lineWidth = 0.5;
     for (let x = 0; x <= canvas.width; x += gridSize) {
       ctx.beginPath();
       ctx.moveTo(x, 0);
@@ -102,12 +119,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   requestAnimationFrame(gameLoop);
 
-  // Konfigurationsmenü
-  const applySettingsBtn = document.getElementById('applySettings');
-  applySettingsBtn.addEventListener('click', () => {
+  // Event Listener
+  document.getElementById('applySettings').addEventListener('click', () => {
     const timerValue = parseInt(document.getElementById('ampelTimer').value, 10);
     trafficLight.updateTimer(timerValue);
-    console.log('Ampel-Timer aktualisiert auf:', timerValue);
-    alert('Einstellungen wurden übernommen.');
   });
 });
