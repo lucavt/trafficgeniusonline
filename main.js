@@ -2,11 +2,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const canvas = document.getElementById('gameCanvas');
   const ctx = canvas.getContext('2d');
 
-  // Canvas-Größe einstellen
   canvas.width = 800;
   canvas.height = 600;
 
-  // TrafficLight-Klasse definieren
+  // TrafficLight-Klasse mit realistischer Darstellung
   class TrafficLight {
     constructor(x, y, timer = 30) {
       this.x = x;
@@ -41,11 +40,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     draw(ctx) {
+      // Ampel-Gehäuse zeichnen
+      ctx.fillStyle = 'black';
+      ctx.fillRect(this.x - 15, this.y - 50, 30, 90);
+
+      // Rot
       ctx.beginPath();
-      ctx.arc(this.x, this.y, 20, 0, Math.PI * 2);
-      ctx.fillStyle = this.state === 'rot' ? 'red' : this.state === 'gelb' ? 'yellow' : 'green';
+      ctx.arc(this.x, this.y - 30, 10, 0, Math.PI * 2);
+      ctx.fillStyle = this.state === 'rot' ? 'red' : 'darkred';
       ctx.fill();
-      ctx.stroke();
+
+      // Gelb
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, 10, 0, Math.PI * 2);
+      ctx.fillStyle = this.state === 'gelb' ? 'yellow' : 'darkgoldenrod';
+      ctx.fill();
+
+      // Grün
+      ctx.beginPath();
+      ctx.arc(this.x, this.y + 30, 10, 0, Math.PI * 2);
+      ctx.fillStyle = this.state === 'grün' ? 'green' : 'darkgreen';
+      ctx.fill();
     }
   }
 
